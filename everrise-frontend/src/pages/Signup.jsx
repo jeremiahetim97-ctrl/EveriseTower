@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Added useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // 2. Initialize the navigate function
+  const navigate = useNavigate();
+
+  // --- CLOUD API CONFIG ---
+  // This points to your live Render backend instead of your local computer
+  const API_URL = "https://everisetower.onrender.com";
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/signup', {
+      // Updated fetch to use the cloud API_URL
+      const response = await fetch(`${API_URL}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -20,13 +25,13 @@ export default function Signup() {
 
       if (response.ok) {
         alert("✅ Account Established: Welcome to EverRise!");
-        // 3. Automatically send user to the login page
         navigate('/login'); 
       } else {
-        alert("❌ Error: " + data.error);
+        alert("❌ Error: " + (data.error || "Signup failed"));
       }
     } catch (err) {
-      alert("❌ Server is offline. Make sure 'node server.js' is running!");
+      // Updated error message for the cloud environment
+      alert("❌ The server is currently waking up or offline. Please try again in 30 seconds.");
     }
   };
 

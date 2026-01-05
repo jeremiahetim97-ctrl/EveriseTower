@@ -6,11 +6,16 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); 
 
+  // --- ADD THIS LINE ---
+  // Replace this with your actual Render URL
+  const API_URL = "https://everisetower.onrender.com";
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      // --- UPDATED FETCH URL ---
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -19,23 +24,16 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // --- UPDATED STEPS ---
-        // 1. Save login state for ProtectedRoute
         localStorage.setItem("isLoggedIn", "true"); 
-
-        // 2. Save the email address for the Dashboard greeting
         localStorage.setItem("userEmail", email); 
-
-        // 3. Alert the user
         alert("✅ Welcome back to EverRise!");
-
-        // 4. Move the user to the dashboard
         navigate('/dashboard'); 
       } else {
         alert("❌ " + (data.error || "Login failed"));
       }
     } catch (err) {
-      alert("❌ Cannot reach server. Is node server.js running?");
+      // Updated error message to reflect the cloud status
+      alert("❌ Cannot reach the cloud server. Please try again in a moment.");
     }
   };
 
