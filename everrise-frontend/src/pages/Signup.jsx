@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false); // New state for the move to login
   const navigate = useNavigate();
 
-  // --- CLOUD API CONFIG ---
-  // This points to your live Render backend instead of your local computer
   const API_URL = "https://everisetower.onrender.com";
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // Updated fetch to use the cloud API_URL
       const response = await fetch(`${API_URL}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -24,14 +25,19 @@ export default function Signup() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("✅ Account Established: Welcome to EverRise!");
-        navigate('/login'); 
+        toast.success("✅ Account Established: Welcome to EverRise!");
+        setLoading(false); // API call finished
+        setIsRedirecting(true); // Start the redirect phase
+        
+        setTimeout(() => navigate('/login'), 2000); 
       } else {
-        alert("❌ Error: " + (data.error || "Signup failed"));
+        toast.error("❌ " + (data.error || "Signup failed"));
+        setLoading(false);
       }
     } catch (err) {
-      // Updated error message for the cloud environment
-      alert("❌ The server is currently waking up or offline. Please try again in 30 seconds.");
+      console.error("Signup Fetch Error:", err);
+      toast.warn("❌ The server is waking up. Please wait 30 seconds and try again.");
+      setLoading(false);
     }
   };
 
@@ -49,6 +55,7 @@ export default function Signup() {
               placeholder="Email address" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading || isRedirecting}
               required 
             />
           </div>
@@ -60,11 +67,20 @@ export default function Signup() {
               placeholder="Create Password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading || isRedirecting}
               required 
             />
           </div>
 
-          <button type="submit" className="auth-btn">Establish Account</button>
+          <button 
+            type="submit" 
+            className="auth-btn" 
+            disabled={loading || isRedirecting}
+          >
+            {loading && <span><i className="fas fa-spinner fa-spin"></i> Establishing Account...</span>}
+            {isRedirecting && <span><i className="fas fa-circle-notch fa-spin"></i> Redirecting to Login...</span>}
+            {!loading && !isRedirecting && "Establish Account"}
+          </button>
         </form>
 
         <p className="auth-footer">

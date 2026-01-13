@@ -5,10 +5,13 @@ import logo from '../assets/logo.png';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Helper to close mobile menu when a link is clicked
+  const closeMenu = () => setIsOpen(false);
+
   return (
     <nav>
       <div className="logo-container">
-        <Link to="/" className="logo-link">
+        <Link to="/" className="logo-link" onClick={closeMenu}>
           <img src={logo} alt="EverRise Logo" />
           <span className="logo-text">EVERRISE <span className="red-text">TOWERS</span></span>
         </Link>
@@ -19,11 +22,19 @@ const Navbar = () => {
       </div>
 
       <ul className={isOpen ? "nav-links active" : "nav-links"}>
-        <li><Link to="/" onClick={() => setIsOpen(false)}>Home</Link></li>
-        <li><Link to="/services" onClick={() => setIsOpen(false)}>Services</Link></li>
-        <li><Link to="/projects" onClick={() => setIsOpen(false)}>Projects</Link></li>
-        <li><Link to="/login" onClick={() => setIsOpen(false)}>Login</Link></li>
-        <li><Link to="/signup" className="nav-cta" onClick={() => setIsOpen(false)}>Join Now</Link></li>
+        {/* Updated: Home now goes to the Brand/Highlights page */}
+        <li><Link to="/home" onClick={closeMenu}>Home</Link></li>
+        
+        {/* New: About link leads to the Hero + About combined page */}
+        <li><Link to="/about" onClick={closeMenu}>About</Link></li>
+        
+        <li><Link to="/services" onClick={closeMenu}>Services</Link></li>
+        <li><Link to="/projects" onClick={closeMenu}>Projects</Link></li>
+        
+        <li><Link to="/login" onClick={closeMenu}>Login</Link></li>
+        
+        {/* CTA: Still points to root (/) since Signup is your landing page */}
+        <li><Link to="/" className="nav-cta" onClick={closeMenu}>Join Now</Link></li>
       </ul>
     </nav>
   );

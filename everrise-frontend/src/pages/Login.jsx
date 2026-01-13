@@ -1,20 +1,21 @@
 import React, { useState } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom'; 
+// 1. Import toast
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Added loading state for button feedback
   const navigate = useNavigate(); 
 
-  // --- ADD THIS LINE ---
-  // Replace this with your actual Render URL
   const API_URL = "https://everisetower.onrender.com";
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // --- UPDATED FETCH URL ---
       const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,14 +27,22 @@ export default function Login() {
       if (response.ok) {
         localStorage.setItem("isLoggedIn", "true"); 
         localStorage.setItem("userEmail", email); 
-        alert("✅ Welcome back to EverRise!");
-        navigate('/dashboard'); 
+        
+        // 2. Success Notification
+        toast.success("✅ Welcome back to EverRise!");
+        
+        // Small delay to let the toast be seen before navigating
+        setTimeout(() => navigate('/dashboard'), 1500); 
       } else {
-        alert("❌ " + (data.error || "Login failed"));
+        // 3. Error Notification
+        toast.error("❌ " + (data.error || "Login failed"));
       }
     } catch (err) {
-      // Updated error message to reflect the cloud status
-      alert("❌ Cannot reach the cloud server. Please try again in a moment.");
+      console.error("Login Error:", err);
+      // 4. Warning Notification
+      toast.warn("❌ Cannot reach the cloud server. Please try again in a moment.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +60,7 @@ export default function Login() {
               placeholder="Email address" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
               required 
             />
           </div>
@@ -62,11 +72,14 @@ export default function Login() {
               placeholder="Password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
               required 
             />
           </div>
 
-          <button type="submit" className="auth-btn">Authorize Entry</button>
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Verifying..." : "Authorize Entry"}
+          </button>
         </form>
 
         <p className="auth-footer">
