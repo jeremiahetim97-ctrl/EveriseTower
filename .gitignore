@@ -1,0 +1,13 @@
+# Library folders (the heavy stuff)
+node_modules/
+**/node_modules/
+
+# Environment/Secret files
+.env
+*.log
+
+# Build and System files
+dist/
+build/
+.DS_Store
+Thumbs.db
