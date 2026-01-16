@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Eye, EyeOff } from 'lucide-react'; 
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false); // New state for the move to login
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   const API_URL = "https://everisetower.onrender.com";
@@ -25,11 +27,18 @@ export default function Signup() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("✅ Account Established: Welcome to EverRise!");
-        setLoading(false); // API call finished
-        setIsRedirecting(true); // Start the redirect phase
+        // 1. Establish the session immediately for Dashboard access
+        localStorage.setItem("isLoggedIn", "true"); 
+        localStorage.setItem("userEmail", email); 
+
+        // 2. Clear visual cues and show success
+        toast.success("✅ Account Established. Welcome, Chief Engineer.");
         
-        setTimeout(() => navigate('/login'), 2000); 
+        setLoading(false);
+        setIsRedirecting(true); 
+
+        // 3. Direct referral to Dashboard (skipping the Login page)
+        setTimeout(() => navigate('/dashboard'), 2000); 
       } else {
         toast.error("❌ " + (data.error || "Signup failed"));
         setLoading(false);
@@ -60,16 +69,34 @@ export default function Signup() {
             />
           </div>
           
-          <div className="input-group">
+          <div className="input-group" style={{ position: 'relative' }}>
             <i className="fas fa-lock"></i>
             <input 
-              type="password" 
+              type={showPassword ? "text" : "password"} 
               placeholder="Create Password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading || isRedirecting}
               required 
+              style={{ paddingRight: '45px' }} 
             />
+            <button
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#666',
+                display: 'flex',
+                alignItems: 'center',
+                height: '100%'
+              }}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
           <button 
@@ -78,7 +105,7 @@ export default function Signup() {
             disabled={loading || isRedirecting}
           >
             {loading && <span><i className="fas fa-spinner fa-spin"></i> Establishing Account...</span>}
-            {isRedirecting && <span><i className="fas fa-circle-notch fa-spin"></i> Redirecting to Login...</span>}
+            {isRedirecting && <span><i className="fas fa-circle-notch fa-spin"></i> Redirecting to Dashboard...</span>}
             {!loading && !isRedirecting && "Establish Account"}
           </button>
         </form>
